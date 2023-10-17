@@ -62,6 +62,14 @@ export default class PostConcept {
       }
     }
   }
+
+  async getById(_id: ObjectId) {
+    const post = await this.posts.readOne({ _id });
+    if (!post) {
+      throw new NotFoundError(`Post ${_id} does not exist!`);
+    }
+    return post;
+  }
 }
 
 export class PostAuthorNotMatchError extends NotAllowedError {

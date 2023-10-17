@@ -7,6 +7,9 @@ import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import SettingView from "../views/SettingView.vue";
 
+import FeatureView from "../views/FeatureView.vue";
+import SaveView from "../views/SaveView.vue";
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -14,6 +17,16 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: HomeView,
+    },
+    {
+      path: "/featured",
+      name: "Featured",
+      component: FeatureView,
+    },
+    {
+      path: "/saved",
+      name: "Saved",
+      component: SaveView,
     },
     {
       path: "/setting",

@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Post, User, WebSession } from "./app";
+import { Feature, Post, Save, Tag, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -90,7 +90,7 @@ class Routes {
     return Post.delete(_id);
   }
 
-  @Router.get("/friends")
+  /* @Router.get("/friends")
   async getFriends(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return await User.idsToUsernames(await Friend.getFriends(user));
@@ -135,7 +135,133 @@ class Routes {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
     return await Friend.rejectRequest(fromId, user);
+  } */
+
+  @Router.post("/tags")
+  async createTag(name: string) {
+    const created = await Tag.create(name, true);
+    return { msg: created.msg, tag: name };
   }
+
+  @Router.get("/tags")
+  async getTags() {
+    //let tags;
+    //if (author) {
+    //  const id = (await User.getUserByUsername(author))._id;
+    //  posts = await Post.getByAuthor(id);
+    //} else {
+    //  posts = await Post.getPosts({});
+    //}
+    return await Tag.getTags({});
+  }
+
+  @Router.post("/tags/:post")
+  async addPublicTag(session: WebSessionDoc, make_public: string, post_id: ObjectId, tag_id: ObjectId) {
+    const user = WebSession.getUser(session);
+    if (make_public === "yes") {
+      await Post.isAuthor(user, post_id);
+      return await Tag.addTagToPost(post_id, tag_id, user, false);
+    } else {
+      return await Tag.addTagToPost(post_id, tag_id, user, true);
+    }
+  }
+
+  @Router.get("/tags/:id")
+  async getTaggedPosts(tag_type: string, tag_id?: ObjectId) {
+    let privacy;
+    if (tag_type === "private") {
+      privacy = true;
+    } else if (tag_type === "public") {
+      privacy = false;
+    } else {
+      return { msg: "Invalid tag_type input, please input private or public" };
+    }
+    let tagged_posts;
+    if (tag_id) {
+      tagged_posts = await Tag.getTaggedPosts({ tag_id: tag_id, is_private: privacy });
+    } else {
+      tagged_posts = await Tag.getTaggedPosts({ is_private: privacy });
+    }
+    return tagged_posts;
+  }
+
+  @Router.delete("/tags/:id")
+  async removeTagFromPost(session: WebSessionDoc, tag_id: ObjectId, post_id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Tag.removeTaggedByAuthor(user, tag_id, post_id);
+  }
+
+  @Router.get("/saves")
+  async getSavedPosts(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    return Responses.saves(await Save.getSaved({ save_author: user }));
+  }
+
+  @Router.get("/saves/notes")
+  async getSavedPostsWithNotes(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    return await Save.getSaved({ save_author: user, notes: { $not: { $type: 10 }, $exists: true } });
+  }
+
+  @Router.post("/saves/:id")
+  async savePost(session: WebSessionDoc, post_id: ObjectId, notes?: string, options?: PostOptions) {
+    const user = WebSession.getUser(session);
+    return await Save.save(user, post_id, notes, options);
+  }
+
+  @Router.patch("/saves")
+  async editSavedPostsNotes(session: WebSessionDoc, save_id: ObjectId, content: string) {
+    const user = WebSession.getUser(session);
+    await Save.isSaveAuthor(user, save_id);
+    return await Save.editNotes(save_id, content);
+  }
+
+  @Router.delete("/saves")
+  async unsavePost(session: WebSessionDoc, save_id: ObjectId) {
+    const user = WebSession.getUser(session);
+    await Save.isSaveAuthor(user, save_id);
+    return await Save.unsave(user, save_id);
+  }
+
+  /*   @Router.post("/notes/:id")
+  async createNote(session: WebSessionDoc, post_id: ObjectId) {
+    throw Error("not implemented yet");
+  }
+
+  @Router.put("/notes/:id")
+  async editNote(session: WebSessionDoc, note_id: ObjectId) {
+    throw Error("not implemented yet");
+  }
+
+  @Router.delete("/notes/:id")
+  async deleteNote(session: WebSessionDoc, note_id: ObjectId) {
+    throw Error("not implemented yet");
+  } */
+
+  @Router.get("/match")
+  async findPostsByKeyword(keyword: string) {
+    return await Post.getPosts({ content: { $regex: keyword } });
+  }
+
+  @Router.get("/feature")
+  async getFeatured() {
+    return Responses.features(await Feature.getFeatured({}));
+  }
+
+  @Router.post("/feature")
+  async feature(session: WebSessionDoc, post_id: ObjectId) {
+    return await Feature.feature(post_id);
+  }
+
+  @Router.delete("/feature")
+  async unfeature(session: WebSessionDoc, feature_id: ObjectId) {
+    return await Feature.unfeature(feature_id);
+  }
+
+  /* @Router.post("/feature")
+  async setTheme(theme: string) {
+    throw Error("not implemented yet");
+  } */
 }
 
 export default getExpressRouter(new Routes());

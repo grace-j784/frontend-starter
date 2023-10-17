@@ -1,6 +1,8 @@
-import { User } from "./app";
+import { Post, User } from "./app";
+import { FeatureDoc } from "./concepts/feature";
 import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friend";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
+import { SaveDoc } from "./concepts/savour";
 import { Router } from "./framework/router";
 
 /**
@@ -17,6 +19,28 @@ export default class Responses {
     }
     const author = await User.getUserById(post.author);
     return { ...post, author: author.username };
+  }
+
+  static async features(features: FeatureDoc[] | null) {
+    if (!features) {
+      return features;
+    }
+    const featured_posts: PostDoc[] = [];
+    for (const feature of features) {
+      featured_posts.push(await Post.getById(feature.post_id));
+    }
+    return featured_posts.map((post) => ({ ...post }));
+  }
+
+  static async saves(saves: SaveDoc[] | null) {
+    if (!saves) {
+      return saves;
+    }
+    const saved_posts: PostDoc[] = [];
+    for (const save of saves) {
+      saved_posts.push(await Post.getById(save.source_post_id));
+    }
+    return saved_posts.map((post) => ({ ...post }));
   }
 
   /**

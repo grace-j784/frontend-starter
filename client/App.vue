@@ -34,6 +34,12 @@ onBeforeMount(async () => {
         <li>
           <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
+        <li>
+          <RouterLink :to="{ name: 'Featured' }" :class="{ underline: currentRouteName == 'Featured' }"> Featured </RouterLink>
+        </li>
+        <li>
+          <RouterLink :to="{ name: 'Saved' }" :class="{ underline: currentRouteName == 'Saved' }"> Saved </RouterLink>
+        </li>
         <li v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
         </li>
