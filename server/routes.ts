@@ -152,7 +152,7 @@ class Routes {
     //} else {
     //  posts = await Post.getPosts({});
     //}
-    return await Tag.getTags({});
+    return Responses.tags(await Tag.getTags({}));
   }
 
   @Router.post("/tags/:post")

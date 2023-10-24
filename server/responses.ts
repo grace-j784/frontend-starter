@@ -1,8 +1,9 @@
-import { Post, User } from "./app";
+import { Post, Tag, User } from "./app";
 import { FeatureDoc } from "./concepts/feature";
 import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friend";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
 import { SaveDoc } from "./concepts/savour";
+import { TagDoc } from "./concepts/tag";
 import { Router } from "./framework/router";
 
 /**
@@ -41,6 +42,17 @@ export default class Responses {
       saved_posts.push(await Post.getById(save.source_post_id));
     }
     return saved_posts.map((post) => ({ ...post }));
+  }
+
+  static async tags(tags: TagDoc[] | null) {
+    if (!tags) {
+      return tags;
+    }
+    const return_tags: TagDoc[] = [];
+    for (const tag of tags) {
+      return_tags.push(await Tag.getById(tag._id));
+    }
+    return return_tags.map((tag) => ({ ...tag, name: tag.name }));
   }
 
   /**
