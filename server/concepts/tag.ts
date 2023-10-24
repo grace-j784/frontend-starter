@@ -107,13 +107,13 @@ export default class TagConcept {
     if (!tag_name || tag_name == "") {
       throw new NotFoundError(`Tag name cannot be empty!`);
     }
-    const tag_id = this.getTagIDByName(tag_name);
+    const tag_id = await this.getTagIDByName(tag_name);
     if (!tag_id) {
       throw new NotFoundError(`Tag ${tag_name} does not exist!`);
     } else if (user && is_private) {
-      return await this.getTaggedPosts({ tag_name, author: user, is_private: true });
+      return await this.getTaggedPosts({ tag_id, author: user, is_private: true });
     } else {
-      return await this.getTaggedPosts({ tag_name, is_private: false });
+      return await this.getTaggedPosts({ tag_id, is_private: false });
     }
   }
 
