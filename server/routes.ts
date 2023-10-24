@@ -155,6 +155,18 @@ class Routes {
     return Responses.tags(await Tag.getTags({}));
   }
 
+  @Router.get("/tags/tagged/:post")
+  async getTagsOnPost(session: WebSessionDoc, post_id: ObjectId) {
+    const user = WebSession.getUser(session);
+    const priv_tagged_posts = await Tag.getTaggedPosts({ post_id, author: user, is_private: true });
+    const public_tagged_posts = await Tag.getTaggedPosts({ post_id, is_private: false });
+    const tagged_posts = priv_tagged_posts;
+    for (const post of public_tagged_posts) {
+      tagged_posts.push(post);
+    }
+    return Responses.tagged_tags(tagged_posts);
+  }
+
   @Router.post("/tags/:post")
   async addPublicTag(session: WebSessionDoc, make_public: string, post_id: ObjectId, tag_name: string) {
     const user = WebSession.getUser(session);

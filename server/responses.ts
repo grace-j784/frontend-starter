@@ -69,6 +69,18 @@ export default class Responses {
     return return_posts.map((post, i) => ({ ...post, author: authors[i] }));
   }
 
+  static async tagged_tags(tagged: TaggedPostDoc[] | null) {
+    if (!tagged) {
+      return tagged;
+    }
+    const return_tags: TagDoc[] = [];
+    for (const tagged_post of tagged) {
+      return_tags.push(await Tag.getById(tagged_post.tag_id));
+    }
+    //const authors = await User.idsToUsernames(return_posts.map((post) => post.author));
+    return return_tags.map((tag) => ({ ...tag, tag_name: tag.name }));
+  }
+
   /**
    * Same as {@link post} but for an array of PostDoc for improved performance.
    */

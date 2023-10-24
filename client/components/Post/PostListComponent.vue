@@ -14,6 +14,8 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
+let post_tags = ref<Array<Record<string, string>>>([]);
+let show_tags_post_id = ref("");
 let editing = ref("");
 let tagging = ref("");
 let searchAuthor = ref("");
@@ -58,6 +60,18 @@ function updateTagging(id: string) {
   tagging.value = id;
 }
 
+async function seeTags(post_id: string) {
+  let query: Record<string, string> = { post_id: post_id };
+  let postResults;
+  try {
+    postResults = await fetchy("/api/tags/tagged/:post", "GET", { query });
+  } catch (_) {
+    return;
+  }
+  show_tags_post_id.value = post_id;
+  post_tags.value = postResults;
+}
+
 async function savePost(id: string) {
   //let query: Record<string, string> = {};
   try {
@@ -93,7 +107,12 @@ onBeforeMount(async () => {
         <button class="btn-small pure-button" @click="savePost(post._id)">Save</button>
         <button class="btn-small pure-button" @click="updateTagging(post._id)">Add Tag</button>
       </menu>
-      <AddTagForm v-else :post="post" @refreshPosts="getPosts" @addTag="updateTagging" />
+      <AddTagForm v-else-if="isLoggedIn" :post="post" @refreshPosts="getPosts" @addTag="updateTagging" />
+      <button class="btn-small pure-button" @click="seeTags(post._id)">See Tags</button>
+      <menu v-if="show_tags_post_id == post._id">
+        <article v-for="tag in post_tags" :key="tag._id">{{ tag.tag_name }}</article>
+        <article v-if="post_tags.length == 0">Post has no tags</article>
+      </menu>
     </article>
   </section>
   <p v-else-if="loaded">No posts found</p>
