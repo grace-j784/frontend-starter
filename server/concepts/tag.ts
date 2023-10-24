@@ -88,7 +88,11 @@ export default class TagConcept {
   //  return tags;
   //}
 
-  async removeTaggedByAuthor(user: ObjectId, tag_id: ObjectId, post_id: ObjectId) {
+  async removeTaggedByAuthor(user: ObjectId, tag_name: string, post_id: ObjectId) {
+    const tag_id = await this.getTagIDByName(tag_name);
+    if (!tag_id) {
+      throw new NotFoundError(`Tag ${tag_name} does not exist!`);
+    }
     const tag_assigns = await this.tagged.readMany({ tag_id, post_id, author: user });
     if (tag_assigns.length === 0) {
       throw new NotFoundError(`Tag ${tag_id} on post ${post_id} does not exist, or you are not the author of this tag assignment!`);

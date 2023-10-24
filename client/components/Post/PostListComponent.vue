@@ -3,6 +3,7 @@ import CreatePostForm from "@/components/Post/CreatePostForm.vue";
 import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
 import AddTagForm from "@/components/Tags/AddTagForm.vue";
+import DeleteTagForm from "@/components/Tags/DeleteTagForm.vue";
 import SearchByTagForm from "@/components/Tags/SearchByTagForm.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
@@ -18,6 +19,7 @@ let post_tags = ref<Array<Record<string, string>>>([]);
 let show_tags_post_id = ref("");
 let editing = ref("");
 let tagging = ref("");
+let deleting_tag = ref("");
 let searchAuthor = ref("");
 let searchTag = ref("");
 
@@ -58,6 +60,10 @@ function updateEditing(id: string) {
 
 function updateTagging(id: string) {
   tagging.value = id;
+}
+
+function updateDeletingTag(id: string) {
+  deleting_tag.value = id;
 }
 
 async function seeTags(post_id: string) {
@@ -103,11 +109,13 @@ onBeforeMount(async () => {
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
       <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" @savePost="savePost" />
-      <menu v-if="isLoggedIn && tagging !== post._id">
+      <menu v-if="isLoggedIn && tagging !== post._id && deleting_tag != post._id">
         <button class="btn-small pure-button" @click="savePost(post._id)">Save</button>
         <button class="btn-small pure-button" @click="updateTagging(post._id)">Add Tag</button>
+        <button class="btn-small pure-button" @click="updateDeletingTag(post._id)">Remove Tag</button>
       </menu>
-      <AddTagForm v-else-if="isLoggedIn" :post="post" @refreshPosts="getPosts" @addTag="updateTagging" />
+      <AddTagForm v-else-if="isLoggedIn && tagging == post._id" :post="post" @refreshPosts="getPosts" @addTag="updateTagging" />
+      <DeleteTagForm v-else-if="isLoggedIn && deleting_tag == post._id" :post="post" @refreshPosts="getPosts" @deleteTag="updateDeletingTag" />
       <button class="btn-small pure-button" @click="seeTags(post._id)">See Tags</button>
       <menu v-if="show_tags_post_id == post._id">
         <article v-for="tag in post_tags" :key="tag._id">{{ tag.tag_name }}</article>

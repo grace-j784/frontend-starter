@@ -37,10 +37,11 @@ onBeforeMount(async () => {
 async function UnsavePost(id: string) {
   //let query: Record<string, string> = {};
   try {
-    await fetchy(`/api/saves/:id`, "DELETE", { body: { post_id: id } }); // TODO: DEBUG THIS
+    await fetchy(`/api/saves/${id}`, "DELETE"); // TODO: DEBUG THIS
   } catch (_) {
     return;
   }
+  await getSavedPosts();
 }
 </script>
 

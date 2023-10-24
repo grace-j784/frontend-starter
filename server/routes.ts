@@ -168,7 +168,7 @@ class Routes {
   }
 
   @Router.post("/tags/:post")
-  async addPublicTag(session: WebSessionDoc, make_public: string, post_id: ObjectId, tag_name: string) {
+  async addTag(session: WebSessionDoc, make_public: string, post_id: ObjectId, tag_name: string) {
     const user = WebSession.getUser(session);
     if (make_public === "yes") {
       await Post.isAuthor(user, post_id);
@@ -200,10 +200,10 @@ class Routes {
     return Responses.tagged(tagged_posts);
   }
 
-  @Router.delete("/tags/:id")
-  async removeTagFromPost(session: WebSessionDoc, tag_id: ObjectId, post_id: ObjectId) {
+  @Router.delete("/tags/:post_id/:tag_name")
+  async removeTagFromPost(session: WebSessionDoc, post_id: ObjectId, tag_name: string) {
     const user = WebSession.getUser(session);
-    return await Tag.removeTaggedByAuthor(user, tag_id, post_id);
+    return await Tag.removeTaggedByAuthor(user, tag_name, post_id);
   }
 
   @Router.get("/saves")
@@ -231,11 +231,11 @@ class Routes {
     return await Save.editNotes(save_id, content);
   }
 
-  @Router.delete("/saves/:id")
-  async unsavePost(session: WebSessionDoc, post_id: ObjectId) {
+  @Router.delete("/saves/:_id")
+  async unsavePost(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
-    await Save.isSaveAuthorPost(user, post_id);
-    return await Save.unsave(user, post_id);
+    await Save.isSaveAuthorPost(user, _id);
+    return await Save.unsave(user, _id);
   }
 
   /*   @Router.post("/notes/:id")

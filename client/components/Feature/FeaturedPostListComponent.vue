@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
@@ -33,6 +32,15 @@ onBeforeMount(async () => {
   await getFeaturedPosts();
   loaded.value = true;
 });
+
+async function savePost(id: string) {
+  //let query: Record<string, string> = {};
+  try {
+    await fetchy(`/api/saves/:id`, "POST", { body: { post_id: id } });
+  } catch (_) {
+    return;
+  }
+}
 </script>
 
 <template>
@@ -43,7 +51,7 @@ onBeforeMount(async () => {
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getFeaturedPosts" @editPost="updateEditing" />
-      <EditPostForm v-else :post="post" @refreshPosts="getFeaturedPosts" @editPost="updateEditing" />
+      <button class="btn-small pure-button" @click="savePost(post._id)">Save</button>
     </article>
   </section>
   <p v-else-if="loaded">No posts found</p>
