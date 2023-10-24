@@ -9,7 +9,6 @@ import { NotAllowedError, NotFoundError } from "./errors";
 
 export interface TagDoc extends BaseDoc {
   name: string;
-  isPublic: boolean;
 }
 
 export interface TaggedPostDoc extends BaseDoc {
@@ -23,18 +22,47 @@ export default class TagConcept {
   public readonly tags = new DocCollection<TagDoc>("tags");
   public readonly tagged = new DocCollection<TaggedPostDoc>("tagged");
 
-  async create(name: string, isPublic: boolean) {
-    const _id = await this.tags.createOne({ name, isPublic });
+  async create(name: string) {
+    if (name == "") {
+      throw new NotFoundError(`Tag name cannot be empty!`);
+    }
+    const tag_id = await this.getTagIDByName(name);
+    if (tag_id) {
+      throw new NotFoundError(`Tag already exists!`);
+    }
+    const _id = await this.tags.createOne({ name });
     return { msg: "Tag successfully created!", post: await this.tags.readOne({ _id }) };
   }
 
-  async addTagToPost(post_id: ObjectId, tag_id: ObjectId, author: ObjectId, is_private: boolean) {
-    await this.tagged.createOne({ tag_id, post_id, author, is_private });
+  async addTagToPost(post_id: ObjectId, tag_name: string, author: ObjectId, is_private: boolean) {
+    let tag_id = await this.getTagIDByName(tag_name);
+    if (!tag_id) {
+      await this.create(tag_name);
+      tag_id = await this.getTagIDByName(tag_name);
+      if (tag_id) {
+        await this.tagged.createOne({ tag_id, post_id, author, is_private }); // should always enter this
+      }
+      if (is_private) {
+        return { msg: "New private tag successfully added to post!" };
+      } else {
+        return { msg: "New public tag successfully added to post!" };
+      }
+    } else {
+      await this.tagged.createOne({ tag_id, post_id, author, is_private });
+    }
     if (is_private) {
       return { msg: "Private tag successfully added to post!" };
     } else {
       return { msg: "Public tag successfully added to post!" };
     }
+  }
+
+  async getTagIDByName(tag_name: string) {
+    const tag = await this.tags.readOne({ name: tag_name });
+    if (!tag) {
+      return tag;
+    }
+    return tag._id;
   }
 
   async getTags(query: Filter<TagDoc>) {
@@ -73,6 +101,20 @@ export default class TagConcept {
   async remove(_id: ObjectId) {
     await this.tagged.deleteOne({ _id });
     return { msg: "Tag successfully removed from post!" };
+  }
+
+  async getTaggedPostsByTagName(tag_name: string, user?: ObjectId, is_private?: boolean) {
+    if (!tag_name || tag_name == "") {
+      throw new NotFoundError(`Tag name cannot be empty!`);
+    }
+    const tag_id = this.getTagIDByName(tag_name);
+    if (!tag_id) {
+      throw new NotFoundError(`Tag ${tag_name} does not exist!`);
+    } else if (user && is_private) {
+      return await this.getTaggedPosts({ tag_name, author: user, is_private: true });
+    } else {
+      return await this.getTaggedPosts({ tag_name, is_private: false });
+    }
   }
 
   async getTaggedPosts(query: Filter<TaggedPostDoc>) {

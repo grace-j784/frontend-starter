@@ -139,7 +139,7 @@ class Routes {
 
   @Router.post("/tags")
   async createTag(name: string) {
-    const created = await Tag.create(name, true);
+    const created = await Tag.create(name);
     return { msg: created.msg, tag: name };
   }
 
@@ -156,33 +156,36 @@ class Routes {
   }
 
   @Router.post("/tags/:post")
-  async addPublicTag(session: WebSessionDoc, make_public: string, post_id: ObjectId, tag_id: ObjectId) {
+  async addPublicTag(session: WebSessionDoc, make_public: string, post_id: ObjectId, tag_name: string) {
     const user = WebSession.getUser(session);
     if (make_public === "yes") {
       await Post.isAuthor(user, post_id);
-      return await Tag.addTagToPost(post_id, tag_id, user, false);
+      return await Tag.addTagToPost(post_id, tag_name, user, false);
     } else {
-      return await Tag.addTagToPost(post_id, tag_id, user, true);
+      return await Tag.addTagToPost(post_id, tag_name, user, true);
     }
   }
 
-  @Router.get("/tags/:id")
-  async getTaggedPosts(tag_type: string, tag_id?: ObjectId) {
-    let privacy;
-    if (tag_type === "private") {
-      privacy = true;
-    } else if (tag_type === "public") {
-      privacy = false;
-    } else {
-      return { msg: "Invalid tag_type input, please input private or public" };
-    }
+  @Router.get("/tags/tagged")
+  async getTaggedPosts(session: WebSessionDoc, tag_name?: string) {
+    const user = WebSession.getUser(session);
     let tagged_posts;
-    if (tag_id) {
-      tagged_posts = await Tag.getTaggedPosts({ tag_id: tag_id, is_private: privacy });
+    if (tag_name != "all" && tag_name) {
+      const priv_tagged_posts = await Tag.getTaggedPostsByTagName(tag_name, user, true);
+      const public_tagged_posts = await Tag.getTaggedPostsByTagName(tag_name);
+      tagged_posts = priv_tagged_posts;
+      for (const post of public_tagged_posts) {
+        tagged_posts.push(post);
+      }
     } else {
-      tagged_posts = await Tag.getTaggedPosts({ is_private: privacy });
+      const priv_tagged_posts = await Tag.getTaggedPosts({ author: user, is_private: true });
+      const public_tagged_posts = await Tag.getTaggedPosts({ is_private: false });
+      tagged_posts = priv_tagged_posts;
+      for (const post of public_tagged_posts) {
+        tagged_posts.push(post);
+      }
     }
-    return tagged_posts;
+    return Responses.tagged(tagged_posts);
   }
 
   @Router.delete("/tags/:id")
@@ -216,11 +219,11 @@ class Routes {
     return await Save.editNotes(save_id, content);
   }
 
-  @Router.delete("/saves")
-  async unsavePost(session: WebSessionDoc, save_id: ObjectId) {
+  @Router.delete("/saves/:id")
+  async unsavePost(session: WebSessionDoc, post_id: ObjectId) {
     const user = WebSession.getUser(session);
-    await Save.isSaveAuthor(user, save_id);
-    return await Save.unsave(user, save_id);
+    await Save.isSaveAuthorPost(user, post_id);
+    return await Save.unsave(user, post_id);
   }
 
   /*   @Router.post("/notes/:id")

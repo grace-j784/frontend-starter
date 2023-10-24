@@ -33,6 +33,15 @@ onBeforeMount(async () => {
   await getSavedPosts();
   loaded.value = true;
 });
+
+async function UnsavePost(id: string) {
+  //let query: Record<string, string> = {};
+  try {
+    await fetchy(`/api/saves/:id`, "DELETE", { body: { post_id: id } }); // TODO: DEBUG THIS
+  } catch (_) {
+    return;
+  }
+}
 </script>
 
 <template>
@@ -44,6 +53,7 @@ onBeforeMount(async () => {
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getSavedPosts" @editPost="updateEditing" />
       <EditPostForm v-else :post="post" @refreshPosts="getSavedPosts" @editPost="updateEditing" />
+      <button class="btn-small pure-button" @refreshPosts="getSavedPosts" @click="UnsavePost(post._id)">Unsave</button>
     </article>
   </section>
   <p v-else-if="loaded">No posts found or user not logged in</p>

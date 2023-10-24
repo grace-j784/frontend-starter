@@ -20,8 +20,12 @@ export default class SaveConcept {
   public readonly saved = new DocCollection<SaveDoc>("saved");
 
   async save(save_author: ObjectId, source_post_id: ObjectId, notes?: string, options?: PostOptions) {
-    const _id = await this.saved.createOne({ save_author, source_post_id, notes, options });
-    return { msg: "Post saved successfully!", post: await this.saved.readOne({ _id }) };
+    const already_saved = await this.saved.readOne({ save_author, source_post_id });
+    if (!already_saved) {
+      const _id = await this.saved.createOne({ save_author, source_post_id, notes, options });
+      return { msg: "Post saved successfully!", post: await this.saved.readOne({ _id }) };
+    }
+    return { msg: "Post already saved!" };
   }
 
   async getSaved(query: Filter<SaveDoc>) {
@@ -31,8 +35,8 @@ export default class SaveConcept {
     return saved;
   }
 
-  async unsave(save_author: ObjectId, save_id: ObjectId) {
-    await this.saved.deleteOne({ _id: save_id });
+  async unsave(save_author: ObjectId, post_id: ObjectId) {
+    await this.saved.deleteOne({ save_author, source_post_id: post_id });
     return { msg: "Post unsaved successfully!" };
   }
 
@@ -53,6 +57,13 @@ export default class SaveConcept {
     }
     if (save.save_author.toString() !== user.toString()) {
       throw new SaveAuthorNotMatchError(user, _id);
+    }
+  }
+
+  async isSaveAuthorPost(user: ObjectId, post_id: ObjectId) {
+    const save = await this.saved.readOne({ save_author: user, source_post_id: post_id });
+    if (!save) {
+      throw new NotFoundError(`Post ${post_id} does not exist in user's save records!`);
     }
   }
 }

@@ -3,7 +3,7 @@ import { FeatureDoc } from "./concepts/feature";
 import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friend";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
 import { SaveDoc } from "./concepts/savour";
-import { TagDoc } from "./concepts/tag";
+import { TagDoc, TaggedPostDoc } from "./concepts/tag";
 import { Router } from "./framework/router";
 
 /**
@@ -30,7 +30,8 @@ export default class Responses {
     for (const feature of features) {
       featured_posts.push(await Post.getById(feature.post_id));
     }
-    return featured_posts.map((post) => ({ ...post }));
+    const authors = await User.idsToUsernames(featured_posts.map((post) => post.author));
+    return featured_posts.map((post, i) => ({ ...post, author: authors[i] }));
   }
 
   static async saves(saves: SaveDoc[] | null) {
@@ -41,7 +42,8 @@ export default class Responses {
     for (const save of saves) {
       saved_posts.push(await Post.getById(save.source_post_id));
     }
-    return saved_posts.map((post) => ({ ...post }));
+    const authors = await User.idsToUsernames(saved_posts.map((post) => post.author));
+    return saved_posts.map((post, i) => ({ ...post, author: authors[i] }));
   }
 
   static async tags(tags: TagDoc[] | null) {
@@ -53,6 +55,18 @@ export default class Responses {
       return_tags.push(await Tag.getById(tag._id));
     }
     return return_tags.map((tag) => ({ ...tag, name: tag.name }));
+  }
+
+  static async tagged(tagged: TaggedPostDoc[] | null) {
+    if (!tagged) {
+      return tagged;
+    }
+    const return_posts: PostDoc[] = [];
+    for (const tagged_post of tagged) {
+      return_posts.push(await Post.getById(tagged_post.post_id));
+    }
+    const authors = await User.idsToUsernames(return_posts.map((post) => post.author));
+    return return_posts.map((post, i) => ({ ...post, author: authors[i] }));
   }
 
   /**

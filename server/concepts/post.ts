@@ -39,7 +39,11 @@ export default class PostConcept {
   }
 
   async delete(_id: ObjectId) {
-    await this.posts.deleteOne({ _id });
+    const post = await this.posts.readOne({ _id });
+    if (!post) {
+      throw new NotFoundError(`Post ${_id} does not exist!`);
+    }
+    await this.posts.updateOne({ _id }, { content: "[deleted]" });
     return { msg: "Post deleted successfully!" };
   }
 
