@@ -33,6 +33,9 @@ async function getPosts(author?: string) {
   }
   searchAuthor.value = author ? author : "";
   posts.value = postResults;
+  if (show_tags_post_id.value) {
+    await seeTags(show_tags_post_id.value);
+  }
 }
 
 async function getTaggedPosts(tag_name?: string) {
