@@ -22,6 +22,7 @@ export default class PostConcept {
   }
 
   async getPosts(query: Filter<PostDoc>) {
+    //await this.posts.deleteMany({});
     const posts = await this.posts.readMany(query, {
       sort: { dateUpdated: -1 },
     });

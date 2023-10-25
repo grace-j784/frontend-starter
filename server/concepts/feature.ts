@@ -20,6 +20,7 @@ export default class FeatureConcept {
   }
 
   async getFeatured(query: Filter<FeatureDoc>) {
+    //await this.featured.deleteMany({});
     const featured = await this.featured.readMany(query, {
       sort: { dateUpdated: -1 },
     });

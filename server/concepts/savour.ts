@@ -35,6 +35,7 @@ export default class SaveConcept {
   }
 
   async getSaved(query: Filter<SaveDoc>) {
+    //await this.saved.deleteMany({});
     const saved = await this.saved.readMany(query, {
       sort: { dateUpdated: -1 },
     });

@@ -73,7 +73,7 @@ async function seeTags(post_id: string) {
   let query: Record<string, string> = { post_id: post_id };
   let postResults;
   try {
-    postResults = await fetchy("/api/tags/tagged/:post", "GET", { query });
+    postResults = await fetchy(`/api/tags/tagged/${post_id}`, "GET", { query });
   } catch (_) {
     return;
   }
@@ -84,7 +84,7 @@ async function seeTags(post_id: string) {
 async function savePost(id: string) {
   //let query: Record<string, string> = {};
   try {
-    await fetchy(`/api/saves/:id`, "POST", { body: { post_id: id } });
+    await fetchy(`/api/saves/${id}`, "POST", { body: { post_id: id } });
   } catch (_) {
     return;
   }

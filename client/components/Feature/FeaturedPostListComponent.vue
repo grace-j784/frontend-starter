@@ -36,7 +36,7 @@ onBeforeMount(async () => {
 async function savePost(id: string) {
   //let query: Record<string, string> = {};
   try {
-    await fetchy(`/api/saves/:id`, "POST", { body: { post_id: id } });
+    await fetchy(`/api/saves/${id}`, "POST", { body: { post_id: id } });
   } catch (_) {
     return;
   }
