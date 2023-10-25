@@ -43,7 +43,7 @@ export default class Responses {
       saved_posts.push(await Post.getById(save.source_post_id));
     }
     const authors = await User.idsToUsernames(saved_posts.map((post) => post.author));
-    return saved_posts.map((post, i) => ({ ...post, author: authors[i] }));
+    return saved_posts.map((post, i) => ({ ...post, author: authors[i], notes: saves[i].notes }));
   }
 
   static async tags(tags: TagDoc[] | null) {
@@ -79,6 +79,13 @@ export default class Responses {
     }
     //const authors = await User.idsToUsernames(return_posts.map((post) => post.author));
     return return_tags.map((tag) => ({ ...tag, tag_name: tag.name }));
+  }
+
+  static async notes(save: SaveDoc | null) {
+    if (!save) {
+      return save;
+    }
+    return { ...save, notes: save.notes };
   }
 
   /**

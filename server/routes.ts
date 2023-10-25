@@ -218,6 +218,13 @@ class Routes {
     return await Save.getSaved({ save_author: user, notes: { $not: { $type: 10 }, $exists: true } });
   }
 
+  @Router.get("/saves/notes/:post_id")
+  async getPostNotes(session: WebSessionDoc, post_id: ObjectId) {
+    const user = WebSession.getUser(session);
+    const save = await Save.getSavedByPost(user, post_id);
+    return Responses.notes(save);
+  }
+
   @Router.post("/saves/:id")
   async savePost(session: WebSessionDoc, post_id: ObjectId, notes?: string, options?: PostOptions) {
     const user = WebSession.getUser(session);

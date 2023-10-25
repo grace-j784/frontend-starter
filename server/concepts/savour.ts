@@ -10,7 +10,7 @@ export interface PostOptions {
 export interface SaveDoc extends BaseDoc {
   save_author: ObjectId;
   source_post_id: ObjectId;
-  notes?: string;
+  notes: string;
   //title: string;
   //content: string;
   options?: PostOptions;
@@ -33,6 +33,14 @@ export default class SaveConcept {
       sort: { dateUpdated: -1 },
     });
     return saved;
+  }
+
+  async getSavedByPost(user: ObjectId, post_id: ObjectId) {
+    const saved = await this.getSaved({ save_author: user, source_post_id: post_id });
+    if (saved.length == 0) {
+      throw new NotFoundError(`Post ${post_id} does not exist in your save records!`);
+    }
+    return saved[0];
   }
 
   async unsave(save_author: ObjectId, post_id: ObjectId) {

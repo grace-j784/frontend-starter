@@ -12,6 +12,8 @@ const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
 let post_tags = ref<Array<Record<string, string>>>([]);
 let show_tags_post_id = ref("");
+let post_notes = ref("");
+let show_notes_post_id = ref("");
 let editing = ref("");
 //let tagging = ref("");
 //let deleting_tag = ref("");
@@ -46,6 +48,21 @@ async function seeTags(post_id: string) {
   post_tags.value = postResults;
 }
 
+async function seeNotes(post_id: string) {
+  let query: Record<string, string> = { post_id: post_id };
+  let postResults;
+  try {
+    postResults = await fetchy(`/api/saves/notes/${post_id}`, "GET", { query });
+  } catch (_) {
+    return;
+  }
+  show_notes_post_id.value = post_id;
+  post_notes.value = postResults.notes;
+  if (post_notes.value == undefined) {
+    post_notes.value = "";
+  }
+}
+
 onBeforeMount(async () => {
   await getSavedPosts();
   loaded.value = true;
@@ -54,7 +71,7 @@ onBeforeMount(async () => {
 async function UnsavePost(id: string) {
   //let query: Record<string, string> = {};
   try {
-    await fetchy(`/api/saves/${id}`, "DELETE"); // TODO: DEBUG THIS
+    await fetchy(`/api/saves/${id}`, "DELETE");
   } catch (_) {
     return;
   }
@@ -77,6 +94,9 @@ async function UnsavePost(id: string) {
         <article v-for="tag in post_tags" :key="tag._id">{{ tag.tag_name }}</article>
         <article v-if="post_tags.length == 0">Post has no tags</article>
       </menu>
+      <button class="btn-small pure-button" @click="seeNotes(post._id)">Show Notes</button>
+      <article v-if="show_notes_post_id == post._id && post_notes.length == 0">No notes yet</article>
+      <article v-else-if="show_notes_post_id == post._id">Notes: {{ post_notes }}</article>
     </article>
   </section>
   <p v-else-if="loaded">No posts found or user not logged in</p>
