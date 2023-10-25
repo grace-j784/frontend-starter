@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
+import EditSaveNotesForm from "@/components/Savour/EditSaveNotesForm.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
@@ -15,6 +16,7 @@ let show_tags_post_id = ref("");
 let post_notes = ref("");
 let show_notes_post_id = ref("");
 let editing = ref("");
+let editing_notes = ref("");
 //let tagging = ref("");
 //let deleting_tag = ref("");
 let searchAuthor = ref("");
@@ -34,6 +36,10 @@ async function getSavedPosts(author?: string) {
 
 function updateEditing(id: string) {
   editing.value = id;
+}
+
+function updateEditingNotes(id: string) {
+  editing_notes.value = id;
 }
 
 async function seeTags(post_id: string) {
@@ -88,15 +94,21 @@ async function UnsavePost(id: string) {
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getSavedPosts" @editPost="updateEditing" />
       <EditPostForm v-else :post="post" @refreshPosts="getSavedPosts" @editPost="updateEditing" />
-      <button class="btn-small pure-button" @refreshPosts="getSavedPosts" @click="UnsavePost(post._id)">Unsave</button>
+      <div v-if="editing_notes !== post._id">
+        <menu>
+          <button class="btn-small pure-button" @click="updateEditingNotes(post._id)">Edit Notes</button>
+          <button class="btn-small pure-button" @click="seeNotes(post._id)">Show Notes</button>
+        </menu>
+        <article v-if="show_notes_post_id == post._id && post_notes.length == 0">No notes yet</article>
+        <article v-else-if="show_notes_post_id == post._id">Notes: {{ post_notes }}</article>
+      </div>
+      <EditSaveNotesForm v-else :post="post" @refreshPosts="getSavedPosts" @editNotes="updateEditingNotes" />
       <button class="btn-small pure-button" @click="seeTags(post._id)">See Tags</button>
       <menu v-if="show_tags_post_id == post._id">
         <article v-for="tag in post_tags" :key="tag._id">{{ tag.tag_name }}</article>
         <article v-if="post_tags.length == 0">Post has no tags</article>
       </menu>
-      <button class="btn-small pure-button" @click="seeNotes(post._id)">Show Notes</button>
-      <article v-if="show_notes_post_id == post._id && post_notes.length == 0">No notes yet</article>
-      <article v-else-if="show_notes_post_id == post._id">Notes: {{ post_notes }}</article>
+      <button class="btn-small pure-button" @refreshPosts="getSavedPosts" @click="UnsavePost(post._id)">Unsave</button>
     </article>
   </section>
   <p v-else-if="loaded">No posts found or user not logged in</p>
@@ -144,5 +156,6 @@ menu {
   gap: 1em;
   padding: 0;
   margin: 0;
+  align-tracks: left;
 }
 </style>
