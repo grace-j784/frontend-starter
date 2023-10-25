@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { useUserStore } from "@/stores/user";
+import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 import { formatDate } from "../../utils/formatDate";
 
+const { currentUsername } = storeToRefs(useUserStore());
+
 const props = defineProps(["post"]);
 let content = ref("");
-const emit = defineEmits(["editNotes", "refreshPosts"]);
+const emit = defineEmits(["editNotes", "refreshPosts", "seeNotes"]);
 
 const getNotes = async () => {
   let query: Record<string, string> = { post_id: props.post._id };
@@ -27,11 +31,11 @@ onBeforeMount(async () => {
 
 const editNotes = async (content: string) => {
   try {
-    await fetchy(`/api/posts/${props.post._id}`, "PATCH", { body: { update: { content: content } } });
+    await fetchy(`/api/saves/${props.post._id}`, "PATCH", { body: { content: content } });
   } catch (e) {
-    // TODO!
     return;
   }
+  emit("seeNotes");
   emit("editNotes");
   emit("refreshPosts");
 };
@@ -39,7 +43,7 @@ const editNotes = async (content: string) => {
 
 <template>
   <form @submit.prevent="editNotes(content)">
-    <p class="author">{{ props.post.author }}</p>
+    <p class="author">{{ currentUsername }}'s Notes:</p>
     <textarea id="content" v-model="content" placeholder="Add notes!" required> </textarea>
     <div class="base">
       <menu>

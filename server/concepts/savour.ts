@@ -21,8 +21,14 @@ export default class SaveConcept {
 
   async save(save_author: ObjectId, source_post_id: ObjectId, notes?: string, options?: PostOptions) {
     const already_saved = await this.saved.readOne({ save_author, source_post_id });
+    let notes_content;
+    if (!notes) {
+      notes_content = "";
+    } else {
+      notes_content = notes;
+    }
     if (!already_saved) {
-      const _id = await this.saved.createOne({ save_author, source_post_id, notes, options });
+      const _id = await this.saved.createOne({ save_author, source_post_id, notes: notes_content, options });
       return { msg: "Post saved successfully!", post: await this.saved.readOne({ _id }) };
     }
     return { msg: "Post already saved!" };
@@ -40,6 +46,9 @@ export default class SaveConcept {
     if (saved.length == 0) {
       throw new NotFoundError(`Post ${post_id} does not exist in your save records!`);
     }
+    if (saved.length != 1) {
+      throw new NotFoundError(`Unexpected error`);
+    }
     return saved[0];
   }
 
@@ -54,7 +63,7 @@ export default class SaveConcept {
       throw new NotFoundError(`Save ${save_id} does not exist in save records!`);
     }
     await this.saved.updateOne({ _id: save_id }, { notes: content });
-    return { msg: "Saved post notes edited successfully!" };
+    return { msg: "Notes edited successfully!" };
   }
 
   async isSaveAuthor(user: ObjectId, save_id: ObjectId) {

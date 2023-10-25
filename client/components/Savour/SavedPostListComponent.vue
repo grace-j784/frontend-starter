@@ -102,7 +102,7 @@ async function UnsavePost(id: string) {
         <article v-if="show_notes_post_id == post._id && post_notes.length == 0">No notes yet</article>
         <article v-else-if="show_notes_post_id == post._id">Notes: {{ post_notes }}</article>
       </div>
-      <EditSaveNotesForm v-else :post="post" @refreshPosts="getSavedPosts" @editNotes="updateEditingNotes" />
+      <EditSaveNotesForm v-else :post="post" @refreshPosts="getSavedPosts" @editNotes="updateEditingNotes" @seeNotes="seeNotes(post._id)" />
       <button class="btn-small pure-button" @click="seeTags(post._id)">See Tags</button>
       <menu v-if="show_tags_post_id == post._id">
         <article v-for="tag in post_tags" :key="tag._id">{{ tag.tag_name }}</article>

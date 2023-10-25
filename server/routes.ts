@@ -212,7 +212,7 @@ class Routes {
     return Responses.saves(await Save.getSaved({ save_author: user }));
   }
 
-  @Router.get("/saves/notes")
+  @Router.get("/saves/notes/posts")
   async getSavedPostsWithNotes(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return await Save.getSaved({ save_author: user, notes: { $not: { $type: 10 }, $exists: true } });
@@ -225,17 +225,17 @@ class Routes {
     return Responses.notes(save);
   }
 
-  @Router.post("/saves/:id")
+  @Router.post("/saves/:post_id")
   async savePost(session: WebSessionDoc, post_id: ObjectId, notes?: string, options?: PostOptions) {
     const user = WebSession.getUser(session);
     return await Save.save(user, post_id, notes, options);
   }
 
-  @Router.patch("/saves")
-  async editSavedPostsNotes(session: WebSessionDoc, save_id: ObjectId, content: string) {
+  @Router.patch("/saves/:post_id")
+  async editSavedPostsNotes(session: WebSessionDoc, post_id: ObjectId, content: string) {
     const user = WebSession.getUser(session);
-    await Save.isSaveAuthor(user, save_id);
-    return await Save.editNotes(save_id, content);
+    const save = await Save.getSavedByPost(user, post_id);
+    return await Save.editNotes(save._id, content);
   }
 
   @Router.delete("/saves/:_id")
