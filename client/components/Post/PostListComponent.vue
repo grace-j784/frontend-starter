@@ -32,6 +32,7 @@ async function getPosts(author?: string) {
     return;
   }
   searchAuthor.value = author ? author : "";
+  searchTag.value = "";
   posts.value = postResults;
   if (show_tags_post_id.value) {
     await seeTags(show_tags_post_id.value);
@@ -102,7 +103,7 @@ onBeforeMount(async () => {
     <CreatePostForm @refreshPosts="getPosts" />
   </section>
   <div class="row">
-    <h2 v-if="!searchAuthor && !searchTag">Posts:</h2>
+    <h2 v-if="!searchAuthor && (!searchTag || searchTag.length == 0)">Posts:</h2>
     <h2 v-else-if="searchTag">Posts tagged {{ searchTag }}:</h2>
     <h2 v-else>Posts by {{ searchAuthor }}:</h2>
     <SearchPostForm @getPostsByAuthor="getPosts" />

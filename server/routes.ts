@@ -145,7 +145,6 @@ class Routes {
 
   @Router.get("/tags")
   async getTags() {
-    await Feature.getFeatured({});
     //let tags;
     //if (author) {
     //  const id = (await User.getUserByUsername(author))._id;

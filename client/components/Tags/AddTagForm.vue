@@ -21,7 +21,7 @@ const addTag = async (tag_name: string) => {
     <textarea id="content" v-model="content" placeholder="Write tag name here!" required> </textarea>
     <div class="base">
       <menu>
-        <li><button class="btn-small pure-button-primary pure-button" type="submit">Save</button></li>
+        <li><button class="btn-small pure-button-primary pure-button" type="submit">Add</button></li>
         <li><button class="btn-small pure-button" @click="emit('addTag')">Cancel</button></li>
       </menu>
     </div>

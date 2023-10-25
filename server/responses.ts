@@ -63,7 +63,15 @@ export default class Responses {
     }
     const return_posts: PostDoc[] = [];
     for (const tagged_post of tagged) {
-      return_posts.push(await Post.getById(tagged_post.post_id));
+      let post_already_added = false;
+      for (const added_post of return_posts) {
+        if (added_post._id.equals(tagged_post.post_id)) {
+          post_already_added = true;
+        }
+      }
+      if (post_already_added == false) {
+        return_posts.push(await Post.getById(tagged_post.post_id));
+      }
     }
     const authors = await User.idsToUsernames(return_posts.map((post) => post.author));
     return return_posts.map((post, i) => ({ ...post, author: authors[i] }));

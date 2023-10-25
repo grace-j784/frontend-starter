@@ -70,6 +70,7 @@ export default class TagConcept {
       sort: { dateUpdated: -1 },
     });
     //await this.tags.deleteMany({});
+    //await this.tagged.deleteMany({});
     return posts;
   }
 
@@ -95,7 +96,8 @@ export default class TagConcept {
     }
     const tag_assigns = await this.tagged.readMany({ tag_id, post_id, author: user });
     if (tag_assigns.length === 0) {
-      throw new NotFoundError(`Tag ${tag_id} on post ${post_id} does not exist, or you are not the author of this tag assignment!`);
+      throw new NotFoundError(`Tag ${tag_name} does not exist on this post!`);
+      //throw new NotFoundError(`Tag ${tag_id} on post ${post_id} does not exist, or you are not the author of this tag assignment!`);
     }
     for (const tag_assign of tag_assigns) {
       return await this.remove(tag_assign._id);
