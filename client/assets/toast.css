@@ -1,3 +1,5 @@
+
+
 .toast {
   position: fixed;
   top: 1em;
@@ -8,12 +10,14 @@
   max-width: 60em;
   margin: 0 auto;
 
-  color: #fff;
+  
 }
 
 .error {
-  background-color: #fa5252;
+  background-color: #6D392E;
+  color: #e2f0db;
 }
 .success {
-  background-color: #40c057;
+  background-color: #b5daa4;
+  color: #6D392E;
 }

@@ -108,7 +108,7 @@ async function UnsavePost(id: string) {
         <article v-for="tag in post_tags" :key="tag._id">{{ tag.tag_name }}</article>
         <article v-if="post_tags.length == 0">Post has no tags</article>
       </menu>
-      <button class="btn-small pure-button" @refreshPosts="getSavedPosts" @click="UnsavePost(post._id)">Unsave</button>
+      <button class="pure-button pure-button-primary" @refreshPosts="getSavedPosts" @click="UnsavePost(post._id)">Unsave</button>
     </article>
   </section>
   <p v-else-if="loaded">No posts found or user not logged in</p>

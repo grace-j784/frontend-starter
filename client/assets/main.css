@@ -1,12 +1,30 @@
 /* Add some global styles here! */
 
+body {
+  background-color: #7f5c34;
+  color: white;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  border-color: #f17487;
+  outline-color: #F7AEB9;
+  scrollbar-color: #F7AEB9;
+  column-rule-color: #F7AEB9;
+}
+
 :root {
-  --red: rgb(208, 67, 12);
-  --base-bg: #f1f3f5;
+  --red: #6D392E;
+  --base-bg: #d3b592;
 }
 
 button.btn-small {
   font-size: 80%;
+  color: white;
+  background-color: #B8874F
+}
+
+button.pure-button-primary {
+  background-color: #ee445e;
+  border-color: #f17487;
+  border-width: 1em;
 }
 
 button.button-error {
@@ -15,9 +33,9 @@ button.button-error {
 }
 
 a.button {
-  color: #212529;
-  background-color: #f1f3f5;
-  border: 1px solid #dee2e6;
+  color: white;
+  background-color: #F7AEB9;
+  border: 1px solid #f17487;
   border-radius: 0.25em;
   padding: 0.375em 0.75em;
   text-decoration: none;
@@ -30,3 +48,4 @@ a.button {
   align-items: center;
   gap: 1em;
 }
+
