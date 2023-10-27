@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import AddTagForm from "@/components/Post/AddTagForm.vue";
 import CreatePostForm from "@/components/Post/CreatePostForm.vue";
+import DeleteTagForm from "@/components/Post/DeleteTagForm.vue";
 import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
-import AddTagForm from "@/components/Tags/AddTagForm.vue";
-import DeleteTagForm from "@/components/Tags/DeleteTagForm.vue";
-import SearchByTagForm from "@/components/Tags/SearchByTagForm.vue";
+import SearchByTagForm from "@/components/Post/SearchByTagForm.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
