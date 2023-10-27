@@ -120,7 +120,7 @@ onBeforeMount(async () => {
       </menu>
       <AddTagForm v-else-if="isLoggedIn && tagging == post._id" :post="post" @refreshPosts="getPosts" @addTag="updateTagging" />
       <DeleteTagForm v-else-if="isLoggedIn && deleting_tag == post._id" :post="post" @refreshPosts="getPosts" @deleteTag="updateDeletingTag" />
-      <button class="btn-small pure-button" @click="seeTags(post._id)">See Tags</button>
+      <button v-if="isLoggedIn" class="btn-small pure-button" @click="seeTags(post._id)">See Tags</button>
       <menu v-if="show_tags_post_id == post._id">
         <article v-for="tag in post_tags" :key="tag._id">{{ tag.tag_name }}</article>
         <article v-if="post_tags.length == 0">Post has no tags</article>

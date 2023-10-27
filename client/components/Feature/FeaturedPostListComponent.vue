@@ -51,7 +51,7 @@ async function savePost(id: string) {
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getFeaturedPosts" @editPost="updateEditing" />
-      <button class="btn-small pure-button" @click="savePost(post._id)">Save</button>
+      <button v-if="isLoggedIn" class="btn-small pure-button" @click="savePost(post._id)">Save</button>
     </article>
   </section>
   <p v-else-if="loaded">No posts found</p>

@@ -23,8 +23,17 @@ button.btn-small {
 
 button.pure-button-primary {
   background-color: #ee445e;
-  border-color: #f17487;
-  border-width: 1em;
+  border-color: #ee445e;
+  border-width: 0.5em;
+  border-style: none;
+}
+
+button.btn-small-pink {
+  font-size: 80%;
+  color: white;
+  background-color: #ee445e;
+  height: 25px;
+  border-style: none;
 }
 
 button.button-error {
