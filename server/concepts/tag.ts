@@ -48,6 +48,10 @@ export default class TagConcept {
         return { msg: "New public tag successfully added to post!" };
       }
     } else {
+      const tag_assigns = await this.tagged.readMany({ tag_id, post_id, author });
+      if (tag_assigns.length > 0) {
+        return { msg: "Post already has this private tag!" };
+      }
       await this.tagged.createOne({ tag_id, post_id, author, is_private });
     }
     if (is_private) {
